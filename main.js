@@ -5,6 +5,10 @@ btnGetGateaux.addEventListener("click", (event) => {
   getAllGateaux();
 });
 
+/**
+ * Get all Gateaux
+ */
+
 function getAllGateaux() {
   let requete = new XMLHttpRequest();
   requete.open(
@@ -21,6 +25,10 @@ function getAllGateaux() {
   requete.send();
 }
 
+/**
+ *
+ * Cards for the gateaux (all of them at the same time)
+ */
 function makeCardsGateaux(tableauGateau) {
   let cards = "";
 
@@ -40,14 +48,19 @@ function makeCardsGateaux(tableauGateau) {
     cards += card;
 
     myCards.innerHTML = cards;
-    const btnsShowCake = document.querySelector(".showGateau");
-    btnsShowCake.addEventListener("click", (event) => {
-      showGateaux(element.id);
+  });
+  document.querySelectorAll(".showGateau").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      showGateau(button.value);
     });
   });
 }
 
-function showGateaux(id) {
+/**
+ *
+ * Show a single and specific gateau
+ */
+function showGateau(id) {
   let requete = new XMLHttpRequest();
 
   requete.open(
@@ -57,10 +70,48 @@ function showGateaux(id) {
 
   requete.onload = () => {
     let result = JSON.parse(requete.responseText);
-
-    console.log(result);
-    console.log(id);
+    let gateau = result.gateau;
+    let recettes = result.recettes;
+    cardGateau(gateau, recettes);
   };
 
   requete.send();
+}
+/**
+ * Make a card for a single and specific Gateau
+ */
+function cardGateau(gateau, recettes) {
+  myCardGateau = `        <div class="col-4 p-3">
+
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+        <h5 class="card-title">${gateau.name}</h5>
+        <p class="card-text">${gateau.flavor}</p>
+        </div>
+             <button class="btn btn-success retourGateaux">Retour aux Gateaux</button>
+     </div> 
+   
+</div>`;
+  myCards.innerHTML = myCardGateau;
+
+  cardsRecettes = "";
+
+  recettes.forEach((recette) => {
+    cardRecette = `        <div class="row" data-recette="${recette.id}">
+    <hr>
+        <p><strong>${recette.name}</strong></p>
+        <p>${recette.description}</p>
+<button class="btn btn-danger supprRecette" value="${recette.id}">Supprimer</button>
+       
+    <hr>
+</div>`;
+
+    cardsRecettes += cardRecette;
+  });
+  myCards.innerHTML += cardsRecettes;
+  document
+    .querySelector(".retourGateaux")
+    .addEventListener("click", (event) => {
+      getAllGateaux();
+    });
 }
